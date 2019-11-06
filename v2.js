@@ -56,14 +56,28 @@
 	var Overflow = (function() {
 		var defaults = {
 			maxStep: 10,
-			minStep: 1,
+			minStep: 1
 		};
 
 		var module = {};
 		var _sourceLayer, _testLayer;
 
+		module.exists = function(textLayer) {
+			if (!TextLayerEx.isTextLayer(textLayer) || !TextLayerEx.isBoxText(textLayer)) {
+				return false;
+			}
+
+			init(textLayer);
+
+			var exists = hasOverflow();
+
+			cleanup();
+
+			return exists;
+		};
+
 		module.fix = function(textLayer, parameters) {
-			if (!(textLayer instanceof TextLayer && TextLayerEx.isBoxText(textLayer))) {
+			if (!TextLayerEx.isTextLayer(textLayer) || !TextLayerEx.isBoxText(textLayer)) {
 				return textLayer;
 			}
 
@@ -82,15 +96,22 @@
 				incrementFontSize(-parameters.minStep);
 			}
 
-			_testLayer.remove();
+			cleanup();
 
 			return _sourceLayer;
 		};
 
 		return module;
 
+		function cleanup() {
+			_testLayer.remove();
+		}
+
 		function hasOverflow() {
-			return TextLayerEx.getNumberOfLines(_sourceLayer) < TextLayerEx.getNumberOfLines(_testLayer);
+			var sourceNumLines = TextLayerEx.getNumberOfLines(_sourceLayer);
+			var testNumLines = TextLayerEx.getNumberOfLines(_testLayer);
+
+			return sourceNumLines < testNumLines;
 		}
 
 		function incrementFontSize(value) {
@@ -101,7 +122,10 @@
 		function init(textLayer) {
 			_sourceLayer = textLayer;
 			_testLayer = textLayer.duplicate();
-			TextLayerEx.setTextboxSize(_testLayer, [undefined, 99999]);
+			_testLayer.enabled = false;
+
+			var boxTextHeight = 99999;
+			TextLayerEx.setBoxTextSize(_testLayer, [undefined, boxTextHeight]);
 		}
 	})();
 
@@ -128,21 +152,25 @@
 		};
 
 		module.incrementFontSize = function(textLayer, incrementValue) {
-			var value = module.getValue(textLayer);
-			value.fontSize += incrementValue;
-			module.setValue(textLayer, value);
+			var textValue = module.getValue(textLayer);
+			textValue.fontSize += incrementValue;
+			module.setValue(textLayer, textValue);
 
-			return value.fontSize;
+			return textValue.fontSize;
 		};
 
 		module.isBoxText = function(textLayer) {
-			var value = module.getValue(textLayer);
-			return value.boxText;
+			var textValue = module.getValue(textLayer);
+			return textValue.boxText;
 		};
 
-		module.setTextboxSize = function(textLayer, size) {
-			var value = module.getValue(textLayer);
-			var boxTextSize = value.boxTextSize;
+		module.isTextLayer = function(textLayer) {
+			return textLayer instanceof TextLayer;
+		};
+
+		module.setBoxTextSize = function(textLayer, size) {
+			var textValue = module.getValue(textLayer);
+			var boxTextSize = textValue.boxTextSize;
 
 			if (typeof size !== 'undefined') {
 				size = ArrayEx.ensureIsArray(size);
@@ -151,8 +179,8 @@
 				boxTextSize[1] = size[1] || boxTextSize[1];
 			}
 
-			value.boxTextSize = boxTextSize;
-			module.setValue(textLayer, value);
+			textValue.boxTextSize = boxTextSize;
+			module.setValue(textLayer, textValue);
 		};
 
 		module.setValue = function(textLayer, textValue) {
