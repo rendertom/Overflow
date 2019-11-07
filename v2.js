@@ -81,7 +81,7 @@
 				return textLayer;
 			}
 
-			parameters = ObjectEx.assign(defaults, parameters);
+			parameters = parseParameters(parameters);
 			init(textLayer);
 
 			if (hasOverflow()) {
@@ -127,6 +127,19 @@
 			var boxTextHeight = 99999;
 			TextLayerEx.setBoxTextSize(_testLayer, [undefined, boxTextHeight]);
 		}
+
+		function parseParameters(parameters) {
+			parameters = ObjectEx.assign(defaults, parameters);
+			parameters.maxStep = toPositive(parameters.maxStep);
+			parameters.minStep = toPositive(parameters.minStep);
+
+			return parameters;
+		}
+
+		function toPositive(value) {
+			return value > 0 ? value : -value;
+		}
+
 	})();
 
 	var TextLayerEx = (function() {
