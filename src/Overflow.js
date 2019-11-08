@@ -36,11 +36,13 @@ var Overflow = (function() {
 					incrementBoxHeight(parameters.maxStep);
 				}
 
-				while (!hasOverflow()) {
-					incrementBoxHeight(-parameters.minStep);
-				}
+				if (parameters.minStep) {
+					while (!hasOverflow()) {
+						incrementBoxHeight(-parameters.minStep);
+					}
 
-				incrementBoxHeight(parameters.minStep);
+					incrementBoxHeight(parameters.minStep);
+				}
 			}
 
 			return textLayer;
@@ -60,11 +62,13 @@ var Overflow = (function() {
 					incrementFontSize(-parameters.maxStep);
 				}
 
-				while (!hasOverflow()) {
-					incrementFontSize(parameters.minStep);
-				}
+				if (parameters.minStep) {
+					while (!hasOverflow()) {
+						incrementFontSize(parameters.minStep);
+					}
 
-				incrementFontSize(-parameters.minStep);
+					incrementFontSize(-parameters.minStep);
+				}
 			}
 
 			return textLayer;
