@@ -14,7 +14,7 @@
 			return alert('Please select a layer');
 		}
 
-		app.beginUndoGroup("undoString");
+		app.beginUndoGroup('Fix Overflow');
 
 		Overflow.compact(layer);
 		// Overflow.expand(layer);
