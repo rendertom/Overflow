@@ -9,17 +9,21 @@
 			return alert('Please select composition first');
 		}
 
-		var layer = composition.selectedLayers[0];
-		if (!layer) {
+		var textLayer = composition.selectedLayers[0];
+		if (!textLayer) {
 			return alert('Please select a layer');
 		}
 
 		app.beginUndoGroup('Fix Overflow');
 
-		Overflow.compact(layer);
-		// Overflow.expand(layer);
-		// var e = Overflow.exists(layer);
-		// alert(e);
+		// Check whether textLayer contains overflowing text
+		Overflow.exists(textLayer);
+
+		// Modify the textbox height to fit the overflowing text
+		Overflow.expand(textLayer);
+
+		// Scale font size down until all the text fits inside the textbox
+		Overflow.compact(textLayer);
 
 		app.endUndoGroup();
 
